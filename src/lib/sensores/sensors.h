@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define DATA_SIZE 10
+#define DATA_SIZE 20
 #define HISTORY_SIZE 20
 
 double read_temperature();
