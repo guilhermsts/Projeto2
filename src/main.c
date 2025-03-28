@@ -14,7 +14,7 @@
 /* ******************************************************/
 #include <stdio.h>
 #include <string.h>
-#include "cmdproc.h"
+#include "lib/uart/cmdproc.h"
 
 
 int main(void) 
