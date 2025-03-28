@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.10)
 project(Projeto2)
 
 # Add the sensorLib folder to the build
-add_subdirectory(lib/sensores lib/uart)
+add_subdirectory(lib)
 
 # Add the executable
 add_executable(main main.c)
@@ -14,7 +14,7 @@ target_compile_options(main PUBLIC -Wall)
 
 # Generate variables with set of libs and include folders
 # Dependencies for libraries files are automatically set 
-list(APPEND EXTRA_LIBS cmdLib sensorLib)
+list(APPEND EXTRA_LIBS sensorcmdLib)
 list(APPEND EXTRA_INCLUDES "${CMAKE_SOURCE_DIR}/lib")
 
 # Specify libraries or flags to use when linking a given target 
