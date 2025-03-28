@@ -79,6 +79,10 @@ int cmdProcessor(void)
 				/* command from the RX buffer. I'm just resetting it, which is not 	*/
 				/* a good solution, as a new command could be in progress and		*/
 				/* resetting  will generate errors									*/
+
+				memmove(UARTRxBuffer, UARTRxBuffer + i + 7, rxBufLen - (i + 7));
+                rxBufLen -= (i + 7);
+				
 				rxBufLen = 0;	
 				
 				return 0;
@@ -108,7 +112,27 @@ int calcChecksum(unsigned char * buf, int nbytes) {
 	
 	/* That is your work to do. In this example I just assume 	*/
 	/* that the checksum is always OK.							*/	
-	return 1;		
+
+	int checksum = 0;
+    char checksum_str[4];
+    
+    // Calcula a soma módulo 256 dos primeiros n bytes
+    for (int i = 0; i < nbytes; i++) {
+        checksum += buf[i];
+    }
+    checksum %= 256; // Garantir que está no intervalo de um byte
+    
+    // Converte o checksum para ASCII (3 dígitos)
+    snprintf(checksum_str, sizeof(checksum_str), "%03d", checksum);
+    
+    // Compara os caracteres gerados com os armazenados no RX buffer
+    if (checksum_str[0] != UARTRxBuffer[nbytes] ||
+        checksum_str[1] != UARTRxBuffer[nbytes + 1] ||
+        checksum_str[2] != UARTRxBuffer[nbytes + 2]) {
+        return 0; // Checksum inválido
+    }
+    
+    return 1; // Checksum válido		
 }
 
 /*
