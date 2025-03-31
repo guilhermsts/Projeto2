@@ -1,7 +1,7 @@
 /** \file sensors.c
- *  \brief ...
+ *  \brief Implementação das funções do sensor inteligente
  * 
- *  Pequena introdução do ficheiro
+ *  Implementação das funções necessárias para o sensor realizar os comandos a receber da uart.
  * 
  *  \author Guilherme Santos, 103143
  *  \date 26/03/2025
@@ -83,7 +83,7 @@ int read_co2()
 
 void get_last_temp_data(double* buffer)
 {
-    int dummy = 0;
+    static int dummy;
     if (temp_history_index != 0)
     {
         int dummy = temp_history_index - 1;
@@ -104,8 +104,7 @@ void get_last_temp_data(double* buffer)
 
 void get_last_hum_data(double* buffer)
 {
-    int dummy = 0;
-
+    static int dummy;
     if (hum_history_index != 0)
     {
         int dummy = hum_history_index - 1;
@@ -126,8 +125,7 @@ void get_last_hum_data(double* buffer)
 
 void get_last_co2_data(int* buffer)
 {
-    int dummy = 0;
-
+    static int dummy;
     if (co2_history_index != 0)
     {
         int dummy = co2_history_index - 1;
