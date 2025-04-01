@@ -11,20 +11,20 @@
 #include "unity.h"
 #include "sensors.h"
 
-double expected_temp1[DATA_SIZE]={60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0};
-double expected_temp2[DATA_SIZE]={-50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3};
-double expected_temp[DATA_SIZE];
+double expected_temp1[20]={60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0};
+double expected_temp2[20]={-50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3};
+double expected_temp[20];
 
-double expected_hum1[DATA_SIZE] = {100.0, 89.9, 75.5, 67.2, 50.0, 33.3, 24.6, 15.2, 5.8, 0.0, 100.0, 89.9, 75.5, 67.2, 50.0, 33.3, 24.6, 15.2, 5.8, 0.0};
-double expected_hum2[DATA_SIZE] = {0.0, 100.0, 89.9, 75.5, 67.2, 50.0, 33.3, 24.6, 15.2, 5.8, 0.0, 100.0, 89.9, 75.5, 67.2, 50.0, 33.3, 24.6, 15.2, 5.8};
-double expected_hum[DATA_SIZE];
+double expected_hum1[20] = {100.0, 89.9, 75.5, 67.2, 50.0, 33.3, 24.6, 15.2, 5.8, 0.0, 100.0, 89.9, 75.5, 67.2, 50.0, 33.3, 24.6, 15.2, 5.8, 0.0};
+double expected_hum2[20] = {0.0, 100.0, 89.9, 75.5, 67.2, 50.0, 33.3, 24.6, 15.2, 5.8, 0.0, 100.0, 89.9, 75.5, 67.2, 50.0, 33.3, 24.6, 15.2, 5.8};
+double expected_hum[20];
 
-int expected_co2_1[DATA_SIZE] = {20000, 19000, 17500, 15000, 12500, 10000, 7500, 5000, 2500, 400, 20000, 19000, 17500, 15000, 12500, 10000, 7500, 5000, 2500, 400};
-int expected_co2_2[DATA_SIZE] = {400, 20000, 19000, 17500, 15000, 12500, 10000, 7500, 5000, 2500, 400, 20000, 19000, 17500, 15000, 12500, 10000, 7500, 5000, 2500};
-int expected_co2[DATA_SIZE];
+int expected_co2_1[20] = {20000, 19000, 17500, 15000, 12500, 10000, 7500, 5000, 2500, 400, 20000, 19000, 17500, 15000, 12500, 10000, 7500, 5000, 2500, 400};
+int expected_co2_2[20] = {400, 20000, 19000, 17500, 15000, 12500, 10000, 7500, 5000, 2500, 400, 20000, 19000, 17500, 15000, 12500, 10000, 7500, 5000, 2500};
+int expected_co2[20];
 
-int expected_reset[DATA_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-int reset_obtained[DATA_SIZE];
+int expected_reset[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+int reset_obtained[20];
 
 void test_read_temperature(void)
 {
@@ -101,34 +101,34 @@ void test_read_co2(void)
 void test_get_last_temp(void)
 {
     
-    get_last_temp_data(*expected_temp);
+    get_last_temp_data(expected_temp);
     TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_temp1, expected_temp);
     TEST_ASSERT_EQUAL_DOUBLE(-50.0,read_temperature());
-    get_last_temp_data(*expected_temp);
+    get_last_temp_data(expected_temp);
     TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_temp2, expected_temp);
 }
 
 void test_get_last_hum(void)
 {
-    get_last_hum_data(*expected_hum);
+    get_last_hum_data(expected_hum);
     TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_hum1, expected_hum);
     TEST_ASSERT_EQUAL_DOUBLE(0.0, read_humidity());
-    get_last_hum_data(*expected_hum);
+    get_last_hum_data(expected_hum);
     TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_hum2, expected_hum);
 }
 
 void test_get_last_co2(void)
 {
-    get_last_co2_data(*expected_co2);
+    get_last_co2_data(expected_co2);
     TEST_ASSERT_EQUAL_INT_ARRAY(expected_co2_1, expected_co2);
     TEST_ASSERT_EQUAL_INT(400, read_co2());
-    get_last_co2_data(*expected_co2);
+    get_last_co2_data(expected_co2);
     TEST_ASSERT_EQUAL_INT_ARRAY(expected_co2_2, expected_co2);
 }
 
 void test_history_reset(void)
 {
-    history_reset(*reset_obtained);
+    history_reset(reset_obtained);
     TEST_ASSERT_EQUAL_INT_ARRAY(expected_reset, reset_obtained);
 }
 
