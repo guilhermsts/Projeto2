@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include "sensors.h"
 
-double temp_data[DATA_SIZE] = {-50.0, -39.3, -21.0, -9.7, 0.0, 12.2, 29.5, 40.1, 53.0, 60};
-double hum_data[DATA_SIZE] = {0, 5.8, 15.2, 24.6, 33.3, 50, 67.2, 75.5, 89.9, 100};
+double temp_data[DATA_SIZE] = {-50.0, -39.3, -21.0, -9.7, 0.0, 12.2, 29.5, 40.1, 53.0, 60.0};
+double hum_data[DATA_SIZE] = {0.0, 5.8, 15.2, 24.6, 33.3, 50.0, 67.2, 75.5, 89.9, 100.0};
 int co2_data[DATA_SIZE] = {400, 2500, 5000, 7500, 10000, 12500, 15000, 17500, 19000, 20000};
 
 double temp_history[HISTORY_SIZE];
