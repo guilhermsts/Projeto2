@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "cmdproc.h"
+#include "sensors.h"
 
 /* Internal variables */
 /* Used as part of the UART emulation */
@@ -24,7 +25,13 @@ int cmdProcessor(void)
 {
 	int i;
 	unsigned char sid;
-		
+	int sensor_value;
+    char sensor_type;
+    char checksum_str[4];
+    double temp_buffer[HISTORY_SIZE];
+    double hum_buffer[HISTORY_SIZE];
+    int co2_buffer[HISTORY_SIZE];
+
 	/* Detect empty cmd string */
 	if(rxBufLen == 0)
 		return -1; 
@@ -41,17 +48,31 @@ int cmdProcessor(void)
 		
 		switch(UARTRxBuffer[i+1]) { 
 			
+			case 'A':
+				/* Read all real-time values */
+				txChar('#');
+				txChar('a');
+				snprintf(checksum_str, sizeof(checksum_str), "%03d", calcChecksum((unsigned char *)"A", 1));
+				txChar(checksum_str[0]);
+				txChar(checksum_str[1]);
+				txChar(checksum_str[2]);
+				txChar('!');
+				break;
+
 			case 'P':		
-				/* Command "P" detected.							*/
-				/* Follows one DATA byte that specifies the sensor	*/ 
-				/* to read. I assume 't','h','c' for temp., humid. 	*/
-				/* and CO2, resp.									*/   
-		
 				/* Check sensor type */
-				sid = UARTRxBuffer[i+2];
-				if(sid != 't' && sid != 'h' && sid != 'c') {
-					return -2;
-				}
+                if (sid == 't') {
+                    sensor_value = (int)read_temperature();
+                    sensor_type = 't';
+                } else if (sid == 'h') {
+                    sensor_value = (int)read_humidity();
+                    sensor_type = 'h';
+                } else if (sid == 'c') {
+                    sensor_value = read_co2();
+                    sensor_type = 'c';
+                } else {
+                    return -2; /* Invalid sensor type */
+                }
 				
 				/* Check checksum */
 				if(!(calcChecksum(&(UARTRxBuffer[i+1]),2))) {
@@ -63,36 +84,58 @@ int cmdProcessor(void)
 					return -4;
 				}
 			
-				/* Command is (is it? ... ) valid. Produce answer and terminate */ 
-				txChar('#');
-				txChar('p'); /* p is the reply to P 							*/	
-				txChar('t'); /* t indicate that it is a temperature 			*/
-				txChar('+'); /* This is the sensor reading. You should call a 	*/
-				txChar('2'); /*   function that emulates the reading of a 		*/
-				txChar('1'); /*   sensor value 	*/
-				txChar('1'); /* Checksum is 114 decimal in this case		*/
-				txChar('1'); /*   You should call a funcion that computes 	*/
-				txChar('4'); /*   the checksum for any command 				*/  
+                /* Send response */
+                txChar('#');
+                txChar('p');
+                txChar(sensor_type);
+                txChar('+');
+                txChar((sensor_value / 10) + '0');
+                txChar((sensor_value % 10) + '0');
+                txChar(checksum_str[0]);
+                txChar(checksum_str[1]);
+                txChar(checksum_str[2]);
+                txChar('!');
 				txChar('!');
 				
-				/* Here you should remove the characters that are part of the 		*/
-				/* command from the RX buffer. I'm just resetting it, which is not 	*/
-				/* a good solution, as a new command could be in progress and		*/
-				/* resetting  will generate errors									*/
+				break;
+					
+			case 'L':
+                /* Retrieve last 20 samples */
+                get_last_temp_data(temp_buffer);
+                get_last_hum_data(hum_buffer);
+                get_last_co2_data(co2_buffer);
+                txChar('#');
+                txChar('l');
+                snprintf(checksum_str, sizeof(checksum_str), "%03d", calcChecksum((unsigned char *)"L", 1));
+                txChar(checksum_str[0]);
+                txChar(checksum_str[1]);
+                txChar(checksum_str[2]);
+                txChar('!');
+                break;
 
-				memmove(UARTRxBuffer, UARTRxBuffer + i + 7, rxBufLen - (i + 7));
-                rxBufLen -= (i + 7);
-				
-				rxBufLen = 0;	
-				
-				return 0;
-								
+			case 'R':
+                /* Reset history */
+                history_reset(temp_buffer);
+                history_reset(hum_buffer);
+                history_reset((double *)co2_buffer);
+                txChar('#');
+                txChar('r');
+                snprintf(checksum_str, sizeof(checksum_str), "%03d", calcChecksum((unsigned char *)"R", 1));
+                txChar(checksum_str[0]);
+                txChar(checksum_str[1]);
+                txChar(checksum_str[2]);
+                txChar('!');
+                break;
+
 			default:
 				/* If code reaches this place, the command is not recognized */
 				return -2;				
 		}
-		
-		
+
+		/* Remove processed command from buffer */
+		memmove(UARTRxBuffer, UARTRxBuffer + i + 7, rxBufLen - (i + 7));
+        rxBufLen -= (i + 7);
+		return 0;
 	}
 	
 	/* Cmd string not null and SOF not found */
