@@ -9,8 +9,10 @@ add_subdirectory(lib)
 
 # Add the executable
 add_executable(main main.c)
+add_executable(test test.c)
 
 target_compile_options(main PUBLIC -Wall)
+target_compile_options(test PUBLIC -Wall)
 
 # Generate variables with set of libs and include folders
 # Dependencies for libraries files are automatically set 
@@ -20,6 +22,8 @@ list(APPEND EXTRA_INCLUDES "${CMAKE_SOURCE_DIR}/lib")
 # Specify libraries or flags to use when linking a given target 
 # and/or its dependents
 target_link_libraries(main PUBLIC ${EXTRA_LIBS})
+target_link_libraries(test PUBLIC ${EXTRA_LIBS})
 
 # Specifies include directories to use when compiling a given target
 target_include_directories(main PUBLIC ${EXTRA_INCLUDES})
+target_include_directories(test PUBLIC ${EXTRA_INCLUDES})
