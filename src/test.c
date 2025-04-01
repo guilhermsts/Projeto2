@@ -102,34 +102,34 @@ void test_get_last_temp(void)
 {
     
     get_last_temp_data(expected_temp);
-    TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_temp1, expected_temp);
+    TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_temp1, expected_temp, 20);
     TEST_ASSERT_EQUAL_DOUBLE(-50.0,read_temperature());
     get_last_temp_data(expected_temp);
-    TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_temp2, expected_temp);
+    TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_temp2, expected_temp, 20);
 }
 
 void test_get_last_hum(void)
 {
     get_last_hum_data(expected_hum);
-    TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_hum1, expected_hum);
+    TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_hum1, expected_hum, 20);
     TEST_ASSERT_EQUAL_DOUBLE(0.0, read_humidity());
     get_last_hum_data(expected_hum);
-    TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_hum2, expected_hum);
+    TEST_ASSERT_EQUAL_DOUBLE_ARRAY(expected_hum2, expected_hum, 20);
 }
 
 void test_get_last_co2(void)
 {
     get_last_co2_data(expected_co2);
-    TEST_ASSERT_EQUAL_INT_ARRAY(expected_co2_1, expected_co2);
+    TEST_ASSERT_EQUAL_INT_ARRAY(expected_co2_1, expected_co2, 20);
     TEST_ASSERT_EQUAL_INT(400, read_co2());
     get_last_co2_data(expected_co2);
-    TEST_ASSERT_EQUAL_INT_ARRAY(expected_co2_2, expected_co2);
+    TEST_ASSERT_EQUAL_INT_ARRAY(expected_co2_2, expected_co2, 20);
 }
 
 void test_history_reset(void)
 {
     history_reset(reset_obtained);
-    TEST_ASSERT_EQUAL_INT_ARRAY(expected_reset, reset_obtained);
+    TEST_ASSERT_EQUAL_INT_ARRAY(expected_reset, reset_obtained, 20);
 }
 
 int main(void)

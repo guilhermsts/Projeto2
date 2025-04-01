@@ -3,7 +3,7 @@
 ```
 cd mkdir build
 cd build
-cmake ../src
+cmake ../Projeto2/src
 make
 ./main
 ```

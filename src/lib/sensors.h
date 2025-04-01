@@ -85,7 +85,7 @@ void get_last_co2_data(int* buffer);
  *  \author Guilherme Santos, 103143
  *  \date 26/03/2025 
  */
-void history_reset(double* buffer);
+void history_reset(int* buffer);
 
 #endif // SENSORS_H
 

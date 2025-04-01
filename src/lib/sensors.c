@@ -16,7 +16,7 @@ int co2_data[DATA_SIZE] = {400, 2500, 5000, 7500, 10000, 12500, 15000, 17500, 19
 
 double temp_history[HISTORY_SIZE];
 double hum_history[HISTORY_SIZE];
-double co2_history[HISTORY_SIZE];
+int co2_history[HISTORY_SIZE];
 
 static int temp_data_index = 0;
 static int temp_history_index = 0;
@@ -144,7 +144,7 @@ void get_last_co2_data(int* buffer)
     }
 }
 
-void history_reset(double* buffer)
+void history_reset(int* buffer)
 {
     for (int i = 0; i < HISTORY_SIZE; i++)
     {
