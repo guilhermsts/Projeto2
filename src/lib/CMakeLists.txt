@@ -1,6 +1,6 @@
 # Set the source files that make up the library
 set(sensorcmd_lib
-   cmdproc.h cmdproc.c sensors.c sensors.h unity.c unity.h
+   cmdproc.h cmdproc.c sensors.c sensors.h unity.c unity.h unity_internals.h
 )
 
 # Set the library type (can be static or dynamic )
