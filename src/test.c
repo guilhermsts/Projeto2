@@ -26,6 +26,17 @@ int expected_co2[20];
 int expected_reset[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int reset_obtained[20];
 
+void setUp(void)
+{
+    // inicializar o buffer
+    return;
+}
+
+void tearDown(void)
+{
+    return;
+}
+
 void test_read_temperature(void)
 {
     TEST_ASSERT_EQUAL_DOUBLE(-50.0, read_temperature());
