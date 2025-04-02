@@ -48,7 +48,7 @@ double read_temperature()
 double read_humidity()
 {
     double value = hum_data[hum_data_index++];
-    temp_history[hum_history_index++] = value;
+    hum_history[hum_history_index++] = value;
 
     if (hum_data_index >= DATA_SIZE)
     {
@@ -65,8 +65,8 @@ double read_humidity()
 
 int read_co2()
 {
-    double value = co2_data[c02_data_index++];
-    temp_history[co2_history_index++] = value;
+    int value = co2_data[c02_data_index++];
+    co2_history[co2_history_index++] = value;
 
     if (c02_data_index >= DATA_SIZE)
     {
@@ -83,63 +83,57 @@ int read_co2()
 
 void get_last_temp_data(double* buffer)
 {
-    static int dummy;
-    if (temp_history_index != 0)
-    {
-        int dummy = temp_history_index - 1;
-    } else {
-        int dummy = 20;
-    }
+    int index = (temp_history_index == 0) ? (HISTORY_SIZE - 1) : (temp_history_index - 1);
     
     for (int i = 0; i < HISTORY_SIZE; i++)
     {
-       buffer[i] = temp_history[dummy--];
+       buffer[i] = temp_history[index];
 
-       if (dummy < 0)
+       if (index == 0)
        {
-            dummy = 20;
+            index = HISTORY_SIZE - 1;
+       }
+       else
+       {
+            index--;
        }
     }
 }
 
 void get_last_hum_data(double* buffer)
 {
-    static int dummy;
-    if (hum_history_index != 0)
-    {
-        int dummy = hum_history_index - 1;
-    } else {
-        int dummy = 20;
-    }
+    int index = (hum_history_index == 0) ? (HISTORY_SIZE - 1) : (hum_history_index - 1);
     
     for (int i = 0; i < HISTORY_SIZE; i++)
     {
-       buffer[i] = hum_history[dummy--];
+       buffer[i] = hum_history[index];
 
-       if (dummy < 0)
+       if (index == 0)
        {
-            dummy = 20;
+            index = HISTORY_SIZE - 1;
+       }
+       else
+       {
+            index--;
        }
     }
 }
 
 void get_last_co2_data(int* buffer)
 {
-    static int dummy;
-    if (co2_history_index != 0)
-    {
-        int dummy = co2_history_index - 1;
-    } else {
-        int dummy = 20;
-    }
+    int index = (co2_history_index == 0) ? (HISTORY_SIZE - 1) : (co2_history_index - 1);
     
     for (int i = 0; i < HISTORY_SIZE; i++)
     {
-       buffer[i] = co2_history[dummy--];
+       buffer[i] = co2_history[index];
 
-       if (dummy < 0)
+       if (index == 0)
        {
-            dummy = 20;
+            index = HISTORY_SIZE - 1;
+       }
+       else
+       {
+            index--;
        }
     }
 }
