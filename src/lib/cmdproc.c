@@ -43,6 +43,7 @@ int cmdProcessor(void)
 		}
 	}
 	
+
 	/* If a SOF was found look for commands */
 	if(i < rxBufLen) {
 		
@@ -52,14 +53,17 @@ int cmdProcessor(void)
 				/* Read all real-time values */
 				txChar('#');
 				txChar('a');
-				snprintf(checksum_str, sizeof(checksum_str), "%03d", calcChecksum((unsigned char *)"A", 1));
+				snprintf(checksum_str, sizeof(checksum_str), "%d", calcChecksum((unsigned char *)"A", 1));
 				txChar(checksum_str[0]);
 				txChar(checksum_str[1]);
 				txChar(checksum_str[2]);
 				txChar('!');
 				break;
 
-			case 'P':		
+			case 'P':	
+				// O sid está na posição i+2	
+				sid = UARTRxBuffer[i+2]; 
+
 				/* Check sensor type */
                 if (sid == 't') {
                     sensor_value = (int)read_temperature();
@@ -106,7 +110,7 @@ int cmdProcessor(void)
                 get_last_co2_data(co2_buffer);
                 txChar('#');
                 txChar('l');
-                snprintf(checksum_str, sizeof(checksum_str), "%03d", calcChecksum((unsigned char *)"L", 1));
+                snprintf(checksum_str, sizeof(checksum_str), "%d", calcChecksum((unsigned char *)"L", 1));
                 txChar(checksum_str[0]);
                 txChar(checksum_str[1]);
                 txChar(checksum_str[2]);
@@ -115,12 +119,12 @@ int cmdProcessor(void)
 
 			case 'R':
                 /* Reset history */
-                history_reset(temp_buffer);
-                history_reset(hum_buffer);
-                history_reset((double *)co2_buffer);
+                history_reset((int*)temp_buffer);
+                history_reset((int*)hum_buffer);
+                history_reset(co2_buffer);
                 txChar('#');
                 txChar('r');
-                snprintf(checksum_str, sizeof(checksum_str), "%03d", calcChecksum((unsigned char *)"R", 1));
+                snprintf(checksum_str, sizeof(checksum_str), "%d", calcChecksum((unsigned char *)"R", 1));
                 txChar(checksum_str[0]);
                 txChar(checksum_str[1]);
                 txChar(checksum_str[2]);
@@ -183,6 +187,7 @@ int calcChecksum(unsigned char * buf, int nbytes) {
  */
 int rxChar(unsigned char car)
 {
+
 	/* If rxbuff not full add char to it */
 	if (rxBufLen < UART_RX_SIZE) {
 		UARTRxBuffer[rxBufLen] = car;
@@ -198,10 +203,11 @@ int rxChar(unsigned char car)
  */
 int txChar(unsigned char car)
 {
+
 	/* If rxbuff not full add char to it */
 	if (txBufLen < UART_TX_SIZE) {
 		UARTTxBuffer[txBufLen] = car;
-		txBufLen += 1;
+		txBufLen ++;
 		return 0;		
 	}	
 	/* If cmd string full return error */
@@ -234,7 +240,8 @@ void getTxBuffer(unsigned char * buf, int * len)
 	*len = txBufLen;
 	if(txBufLen > 0) {
 		memcpy(buf,UARTTxBuffer,*len);
-	}		
+	}	
+	
 	return;
 }
 

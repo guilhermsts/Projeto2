@@ -46,25 +46,35 @@ int main(void)
 	/* 2 - Process the comand and check the answer */
 	
 	cmdProcessor();
-	
-	getTxBuffer(ans,&len);
-	if(memcmp(ans,ansTest1,len)) {
-		printf("Test 1 failed\n");
-	} else {
-		printf("Test 1 succeeded\n");
-	}	
-	
+
+	txChar('#');
+	txChar('P');
+	txChar('t');
+	txChar('1');
+	txChar('9');
+	txChar('6');
+	txChar('!');
+
+	getTxBuffer(ans, &len);
+
 	/* You can print the answer to see what is wrong, if necessary */
-	printf("\t Received answer:");
-	for(i=0; i < len; i++) {
-		printf("%c", ans[i]);
-	}
-	printf("\n\t Expected answer:");
-	i=sizeof(ansTest1);
-	for(i=0; i< len; i++) {
+	printf("\t Received answer: ");
+	
+		for (i = 0; i < len; i++) {
+			printf("%c", ans[i]);
+		}
+
+	printf("\n\t Expected answer: ");
+	for (i = 0; i < sizeof(ansTest1); i++) {
 		printf("%c", ansTest1[i]);
 	}
 	printf("\n");
+
+	if(memcmp(ans,ansTest1,len)) {
+		printf(" \nTest 1 failed\n");
+	} else {
+		printf("\nTest 1 succeeded\n");
+	}	
 	
 	
 	/* Test 2 */
