@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['sensors_2ec_0',['sensors.c',['../sensors_8c.html',1,'']]],
-  ['sensors_2eh_1',['sensors.h',['../sensors_8h.html',1,'']]],
-  ['setr_2',['Documentação Projeto 2, SETR',['../index.html',1,'']]]
+  ['introdução_0',['Introdução',['../index.html#autotoc_md0',1,'']]]
 ];

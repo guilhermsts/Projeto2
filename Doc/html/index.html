@@ -74,9 +74,45 @@ $(function() {
 <div class="contents">
 <div class="textblock"><h2><a class="anchor" id="autotoc_md0"></a>
 Introdução</h2>
-<ul>
-<li>teste </li>
+<p>Segundo projeto desenvolvido na cadeira de SETR, Sistemas Embutidos e de Tempo Real, onde consiste na implementação de um módulo em C que processe comandos recebidos via UART, um caracter de cada vez. O modulo é parte de um sensor inteligentre que permite a leitura de temperarura (-50ºC ... 60ºC), da humidade relativa (0 ... 100%) e de CO2 (400 ... 20000 ppm).</p>
+<h2><a class="anchor" id="autotoc_md1"></a>
+Especificações</h2>
+<p>Estrutura dos comandos: **# CMD DATA CS !**</p><ul>
+<li><b>- #</b>: um byte, inicio do frame do símbolo</li>
+<li><b>- CMD</b>: um byte, indicação do comando</li>
+<li><b>- DATA</b>: tamanho variável, argumentos do comando</li>
+<li><b>- CS</b>: um byte, checksum. Somatório do valor numérico de CMD e DATA[i] bytes</li>
+<li><b>- !</b>: um byte, inicio do frame do símbolo</li>
 </ul>
+<p>Todas as comunicações são em ASCII. E. g. se a temperatura for +25ºC, os bytes correspondentes serão 43 ('+'), 50 ('2') e 53 ('5').</p>
+<p>Comandos suportados:</p><ul>
+<li><b>- A</b>: lê os valores, em tempo real, fornecidos pelo sensore</li>
+<li><b>- P</b>: lê um dos valores, em tempo real, fornecidos pelo sensor (mostra ou a temperatura ou a humidade ou o CO2)</li>
+<li><b>- L</b>: retorna os últimos 20 valores lidos para cada variável</li>
+<li><b>- R</b>: restaura o histórico</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md2"></a>
+Estrutura do código</h2>
+<ul>
+<li><code>src/lib</code> - Ficheiros .c e .h dos módulos</li>
+<li><code>src</code> - Ficheiros main e teste (untiy testing)</li>
+<li><code>Doc</code> - Geração da página web com a documentação</li>
+<li><code>README</code> - Instruções compilação e gerar a documentação</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md3"></a>
+Ficheiros</h2>
+<ul>
+<li><b>cmdproc (.c/.h)</b>: Ficheiros header e sua respetiva implementação do módulo de processamento dos comandos recebidos via UART</li>
+<li><b>sensors (.c/.h)</b>: Ficheiros header e sua respetiva implementação do sensor que faz a leitura dos três parâmetros</li>
+<li><b>unity (.c/.h)</b>: Ficheiros header e sua respetiva implementação das funções a utilizar para o teste dos módulos a desenvolver (ficheiros retirados da comunidade ThrowTheSwitch.org github )</li>
+<li><b>main.c</b>: Integração e implementação do módulo e sensores</li>
+<li><b><a class="el" href="test_8c.html" title="Ficheiro para teste do módulo.">test.c</a></b>: Ficheiro para teste específico das funções desenvolvidas</li>
+<li><b>README.md</b>: Instruções de compilação e para abrir documentação html</li>
+<li><b>MAINPAGE.md</b>: Ficheiro de configuração da página principal html</li>
+</ul>
+<dl class="section author"><dt>Author</dt><dd>Guilherme Santos, <a href="#" onclick="location.href='mai'+'lto:'+'gui'+'.s'+'ant'+'os'+'@ua'+'.p'+'t'; return false;">gui.s<span class="obfuscator">.nosp@m.</span>anto<span class="obfuscator">.nosp@m.</span>s@ua.<span class="obfuscator">.nosp@m.</span>pt</a> </dd>
+<dd>
+Francisco Bastos, <a href="#" onclick="location.href='mai'+'lto:'+'fcb'+'as'+'tos'+'4@'+'ua.'+'pt'; return false;">fcbas<span class="obfuscator">.nosp@m.</span>tos4<span class="obfuscator">.nosp@m.</span>@ua.p<span class="obfuscator">.nosp@m.</span>t</a> </dd></dl>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->

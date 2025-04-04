@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['history_5freset_0',['history_reset',['../sensors_8c.html#a3dc6276d948211a0c291d8dc9f858610',1,'history_reset(double *buffer):&#160;sensors.c'],['../sensors_8h.html#a3dc6276d948211a0c291d8dc9f858610',1,'history_reset(double *buffer):&#160;sensors.c']]]
+  ['especificações_0',['Especificações',['../index.html#autotoc_md1',1,'']]],
+  ['estrutura_20do_20código_1',['Estrutura do código',['../index.html#autotoc_md2',1,'']]]
 ];

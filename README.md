@@ -11,7 +11,7 @@ make
 ```
 doxygen
 ```
-Podemos ver o documento a partir de (dentro do diretório doc)
+Podemos ver o documento a partir de 
 ```
 cd Doc
 firefox html/index.html &
