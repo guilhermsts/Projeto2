@@ -11,6 +11,7 @@
 //#define UNITY_INCLUDE_DOUBLE 
 #include "unity.h"
 #include "sensors.h"
+#include "cmdproc.h"
 
 double expected_temp1[HISTORY_SIZE]={60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0};
 double expected_temp2[HISTORY_SIZE]={-50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3, -50.0, 60.0, 53.0, 40.1, 29.5, 12.2, 0.0, -9.7, -21.0, -39.3};
@@ -23,9 +24,34 @@ int expected_co2_2[HISTORY_SIZE] = {400, 20000, 19000, 17500, 15000, 12500, 1000
 
 int expected_reset[HISTORY_SIZE] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+extern unsigned char UARTRxBuffer[UART_RX_SIZE];
+extern unsigned char UARTTxBuffer[UART_TX_SIZE];
+extern int rxBufLen;
+extern int txBufLen;
+
+const char expected_frame_A[] = "# A -39.3 5.8 2500 253 !\n";
+const char expected_frame_Pt[] = "# P t -39.3 254 !\n";
+const char expected_frame_Ph[] = "# P h 5.8 147 !\n";
+const char expected_frame_Pc[] = "# P c 2500 186 !\n";
+const char expected_frame_L[] = "# L -50.0 0.0 400 045 !\n"
+                               " # L -39.3 5.8 2500 056 !\n"
+                               " # L -21.0 15.2 5000 067 !\n"
+                               " # L -9.7 24.6 7500 078 !\n"
+                               " # L 0.0 33.3 10000 089 !\n"
+                               " # L 12.2 50.0 12500 100 !\n"
+                               " # L 29.5 67.2 15000 111 !\n"
+                               " # L 40.1 75.5 17500 122 !\n"
+                               " # L 53.0 89.9 19000 133 !\n"
+                               " # L 60.0 100.0 20000 144 !\n";
+const char expected_frame_R[] = "# R 0 162 !\n";
+
+
 void setUp(void)
 {
     // inicializar o buffer
+    resetRxBuffer();
+    resetTxBuffer();
+
     return;
 }
 
@@ -116,6 +142,307 @@ void test_history_reset(void)
     TEST_ASSERT_EQUAL_INT_ARRAY(expected_reset, reset_obtained, 20);
 }
 
+void teste_RX(void)
+{
+
+    int i, result;
+    for (i = 0; i < UART_RX_SIZE; i++) {
+        result = rxChar('A');
+        TEST_ASSERT_EQUAL(0, result); 
+    }
+
+    result = rxChar('B');
+    TEST_ASSERT_EQUAL(-1, result);
+
+    resetRxBuffer();
+
+    unsigned char atual[17];
+    int len;
+
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('P');
+    rxChar(' ');
+    rxChar('t');
+    rxChar(' ');
+    rxChar('+');
+    rxChar('4');
+    rxChar('6');
+    rxChar(' ');
+    rxChar('3');
+    rxChar('4');
+    rxChar('5');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    getRxBuffer(atual,&len);
+    atual[len] = '\0'; 
+    TEST_ASSERT_EQUAL_STRING("# P t +46 345 !\n", atual);
+}
+
+void teste_TX(void)
+{
+    resetTxBuffer();
+    resetRxBuffer();
+
+    unsigned char rx[17];
+    unsigned char tx[17];
+    int len;
+
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('P');
+    rxChar(' ');
+    rxChar('t');
+    rxChar(' ');
+    rxChar('+');
+    rxChar('4');
+    rxChar('6');
+    rxChar(' ');
+    rxChar('3');
+    rxChar('4');
+    rxChar('5');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    getRxBuffer(rx,&len);
+    rx[len] = '\0'; 
+    TEST_ASSERT_EQUAL_STRING("# P t +46 345 !\n", rx);
+
+    copyRxToTxBuffer(tx,&len);
+
+    tx[len] = '\0'; 
+    TEST_ASSERT_EQUAL_STRING(rx, tx);
+}
+
+void test_calc_checksum(void)
+{
+    unsigned char c = 'A';
+    int checksum = calcChecksum(&c, 1);
+
+    TEST_ASSERT_EQUAL_INT(65, checksum);
+
+    unsigned char msg[] = "# P t +46 345 !\n";  // A sequência que queremos testar
+    int checksum2 = calcChecksum(msg, 16);  // Calcula o checksum da sequência
+
+    TEST_ASSERT_EQUAL_INT(227, checksum2);
+}
+
+void test_command_A(void)
+{
+
+    resetRxBuffer();
+    resetTxBuffer();
+    unsigned char tx[30];
+    int return_actual,len;
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('A');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    return_actual = cmdProcessor();
+
+    TEST_ASSERT_EQUAL_INT(0, return_actual);
+
+    getTxBuffer(tx,&len); 
+
+    tx[len] = '\0';
+    TEST_ASSERT_EQUAL_STRING(expected_frame_A,tx);
+
+}
+
+
+void test_command_P_t(void)
+{
+    resetRxBuffer();
+    resetTxBuffer();
+    unsigned char tx[30];
+    int len;
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('P');
+    rxChar(' ');
+    rxChar('t');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    cmdProcessor();
+
+
+    getTxBuffer(tx,&len); 
+    tx[len] = '\0';
+    TEST_ASSERT_EQUAL_STRING(expected_frame_Pt,tx);
+
+}
+
+void test_command_P_h(void)
+{
+    resetRxBuffer();
+    resetTxBuffer();
+    unsigned char tx[30];
+    int len;
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('P');
+    rxChar(' ');
+    rxChar('h');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    cmdProcessor();
+
+
+    getTxBuffer(tx,&len); 
+    tx[len] = '\0';
+    TEST_ASSERT_EQUAL_STRING(expected_frame_Ph,tx);
+
+}
+
+void test_command_P_c(void)
+{
+    resetRxBuffer();
+    resetTxBuffer();
+    unsigned char tx[30];
+    int len;
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('P');
+    rxChar(' ');
+    rxChar('c');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    cmdProcessor();
+
+
+    getTxBuffer(tx,&len); 
+    tx[len] = '\0';
+    TEST_ASSERT_EQUAL_STRING(expected_frame_Pc,tx);
+
+}
+
+void test_command_P_k(void)
+{
+    resetRxBuffer();
+    resetTxBuffer();
+
+    int return_expected;
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('P');
+    rxChar(' ');
+    rxChar('k');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    return_expected = cmdProcessor();
+    TEST_ASSERT_EQUAL_INT(-2,return_expected);
+
+}
+
+void test_command_L(void)
+{
+    resetRxBuffer();
+    resetTxBuffer();
+    unsigned char tx[256];
+    int len;
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('L');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    cmdProcessor();
+    
+    getTxBuffer(tx,&len); 
+    tx[len] = '\0';
+
+    // Imprime a resposta gerada para depuração
+    printf("Generated Response: %s\n", tx);
+
+    TEST_ASSERT_EQUAL_STRING(expected_frame_L,tx);
+
+}
+
+void test_command_R(void)
+{
+    resetRxBuffer();
+    resetTxBuffer();
+    unsigned char tx[256];
+    int len;
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('R');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    cmdProcessor();
+    
+    getTxBuffer(tx,&len); 
+    tx[len] = '\0';
+
+    TEST_ASSERT_EQUAL_STRING(expected_frame_R,tx);
+
+}
+
+void test_command_X(void)
+{
+
+    resetRxBuffer();
+    resetTxBuffer();
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('X');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    int return_actual = cmdProcessor();
+
+
+    TEST_ASSERT_EQUAL_INT(-2, return_actual);
+
+}
+
+void test_command_SOF(void)
+{
+
+    resetRxBuffer();
+    resetTxBuffer();
+
+    rxChar(' ');
+    rxChar('X');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    int return_actual = cmdProcessor();
+
+
+    TEST_ASSERT_EQUAL_INT(-4, return_actual);
+
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -127,6 +454,19 @@ int main(void)
     RUN_TEST(test_get_last_hum);
     RUN_TEST(test_get_last_co2);
     RUN_TEST(test_history_reset);
+
+    RUN_TEST(teste_RX);
+    RUN_TEST(teste_TX);
+    RUN_TEST(test_calc_checksum);
+    RUN_TEST(test_command_A);
+    RUN_TEST(test_command_P_t);
+    RUN_TEST(test_command_P_h);
+    RUN_TEST(test_command_P_c);
+    RUN_TEST(test_command_P_k);
+    RUN_TEST(test_command_L);
+    RUN_TEST(test_command_R);
+    RUN_TEST(test_command_X);
+    RUN_TEST(test_command_SOF);
 
     return UNITY_END();
 }

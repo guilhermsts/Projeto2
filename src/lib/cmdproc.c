@@ -47,33 +47,81 @@ int cmdProcessor(void)
 	/* If a SOF was found look for commands */
 	if(i < rxBufLen) {
 		
-		switch(UARTRxBuffer[i+1]) { 
+		switch(UARTRxBuffer[i+2]) { 
 			
+            
+
 			case 'A':
-				/* Read all real-time values */
-				txChar('#');
-				txChar('a');
-				snprintf(checksum_str, sizeof(checksum_str), "%d", calcChecksum((unsigned char *)"A", 1));
-				txChar(checksum_str[0]);
-				txChar(checksum_str[1]);
-				txChar(checksum_str[2]);
-				txChar('!');
-				break;
+                double temperature = read_temperature();
+                double humidity = read_humidity();
+                int co2 = read_co2();
+            
+                char response[64];
+                char final_response[64];
+
+                snprintf(response, sizeof(response), "A %.1f %.1f %d", temperature, humidity, co2);
+                int checksum = calcChecksum((unsigned char *)response, strlen(response));
+                
+                snprintf(final_response, sizeof(final_response), "# A %.1f %.1f %d %03d", temperature, humidity, co2, checksum);
+
+                for (int i = 0; final_response[i] != '\0'; i++) {
+                    txChar(final_response[i]);
+                }
+                txChar(' ');
+                txChar(EOF_SYM);
+                txChar('\n');
+
+                break;
 
 			case 'P':	
-				// O sid está na posição i+2	
-				sid = UARTRxBuffer[i+2]; 
+            
+                char response1[64];
+                char final_response1[64];
+				// O sid está na posição i+4	
+				sid = UARTRxBuffer[i+4]; 
 
 				/* Check sensor type */
                 if (sid == 't') {
                     sensor_value = (int)read_temperature();
                     sensor_type = 't';
+                    snprintf(response1, sizeof(response1), "P %c %.1f", sensor_type,temperature);
+                    int checksumP = calcChecksum((unsigned char *)response1, strlen(response1));
+                    snprintf(final_response1, sizeof(final_response1), "# P %c %.1f %03d", sensor_type,temperature, checksumP);
+                    for (int i = 0; final_response1[i] != '\0'; i++) {
+                        txChar(final_response1[i]);
+                    }
+                                
+                    txChar(' ');
+                    txChar(EOF_SYM);
+                    txChar('\n');
+
                 } else if (sid == 'h') {
                     sensor_value = (int)read_humidity();
                     sensor_type = 'h';
+                    snprintf(response1, sizeof(response1), "P %c %.1f", sensor_type,humidity);
+                    int checksumP = calcChecksum((unsigned char *)response1, strlen(response1));
+                    snprintf(final_response1, sizeof(final_response1), "# P %c %.1f %03d", sensor_type, humidity, checksumP);
+                    for (int i = 0; final_response1[i] != '\0'; i++) {
+                        txChar(final_response1[i]);
+                    }
+                                
+                    txChar(' ');
+                    txChar(EOF_SYM);
+                    txChar('\n');
+
                 } else if (sid == 'c') {
                     sensor_value = read_co2();
                     sensor_type = 'c';
+                    snprintf(response1, sizeof(response1), "P %c %d", sensor_type,co2);
+                    int checksumP = calcChecksum((unsigned char *)response1, strlen(response1));
+                    snprintf(final_response1, sizeof(final_response1), "# P %c %d %03d", sensor_type, co2, checksumP);
+                    for (int i = 0; final_response1[i] != '\0'; i++) {
+                        txChar(final_response1[i]);
+                    }
+                                
+                    txChar(' ');
+                    txChar(EOF_SYM);
+                    txChar('\n');
                 } else {
                     return -2; /* Invalid sensor type */
                 }
@@ -87,48 +135,59 @@ int cmdProcessor(void)
 				if(UARTRxBuffer[i+6] != EOF_SYM) {
 					return -4;
 				}
-			
-                /* Send response */
-                txChar('#');
-                txChar('p');
-                txChar(sensor_type);
-                txChar('+');
-                txChar((sensor_value / 10) + '0');
-                txChar((sensor_value % 10) + '0');
-                txChar(checksum_str[0]);
-                txChar(checksum_str[1]);
-                txChar(checksum_str[2]);
-                txChar('!');
-				txChar('!');
+
+                
 				
 				break;
 					
 			case 'L':
+                char response2[256];
+                char final_response2[256];
+                int len = 0;
+
+                memset(response2, 0, sizeof(response2));
+                memset(final_response2, 0, sizeof(final_response2));
+
                 /* Retrieve last 20 samples */
                 get_last_temp_data(temp_buffer);
                 get_last_hum_data(hum_buffer);
                 get_last_co2_data(co2_buffer);
-                txChar('#');
-                txChar('l');
-                snprintf(checksum_str, sizeof(checksum_str), "%d", calcChecksum((unsigned char *)"L", 1));
-                txChar(checksum_str[0]);
-                txChar(checksum_str[1]);
-                txChar(checksum_str[2]);
-                txChar('!');
+
+                for (int i = 0; i < 10; i++) {
+                    snprintf(response2, sizeof(response2), "L %.1f %.1f %d ", temp_buffer[i], hum_buffer[i], co2_buffer[i]);
+                    int checksumL = calcChecksum((unsigned char *)response2, strlen(response2));
+                    snprintf(final_response2, sizeof(final_response2), "# L %.1f %.1f %d %03d", temp_buffer[i], hum_buffer[i], co2_buffer[i], checksumL);
+                    //printf("%s", final_response2);
+                    for (int i = 0; final_response2[i] != '\0'; i++) {
+                        txChar(final_response2[i]);
+                    }
+                    txChar(' ');  
+                    txChar(EOF_SYM);
+                    txChar('\n');
+                }
+                printf("txBuffer preenchido: %s\n", UARTTxBuffer);
+
                 break;
 
 			case 'R':
+                char response3[256];
+                char final_response3[256];
+
                 /* Reset history */
                 history_reset((int*)temp_buffer);
                 history_reset((int*)hum_buffer);
                 history_reset(co2_buffer);
-                txChar('#');
-                txChar('r');
-                snprintf(checksum_str, sizeof(checksum_str), "%d", calcChecksum((unsigned char *)"R", 1));
-                txChar(checksum_str[0]);
-                txChar(checksum_str[1]);
-                txChar(checksum_str[2]);
-                txChar('!');
+
+                snprintf(response3, sizeof(response3), "R 0");
+                int checksumR = calcChecksum((unsigned char *)response3, strlen(response3));
+                snprintf(final_response3, sizeof(final_response3), "# R 0 %03d", checksumR);
+                for (int i = 0; final_response3[i] != '\0'; i++) {
+                    txChar(final_response3[i]);
+                }
+
+                txChar(' ');  
+                txChar(EOF_SYM);
+                txChar('\n');
                 break;
 
 			default:
@@ -151,17 +210,9 @@ int cmdProcessor(void)
  * calcChecksum
  */ 
 int calcChecksum(unsigned char * buf, int nbytes) {
-	/* Here you are supposed to compute the modulo 256 checksum */
-	/* of the first n bytes of buf. Then you should convert the */
-	/* checksum to ascii (3 digitas/chars) and compare each one */
-	/* of these digits/characters to the ones in the RxBuffer,	*/
-	/* positions nbytes, nbytes + 1 and nbytes +2. 				*/
-	
-	/* That is your work to do. In this example I just assume 	*/
-	/* that the checksum is always OK.							*/	
 
 	int checksum = 0;
-    char checksum_str[4];
+    char checksum_str[6];
     
     // Calcula a soma módulo 256 dos primeiros n bytes
     for (int i = 0; i < nbytes; i++) {
@@ -169,17 +220,7 @@ int calcChecksum(unsigned char * buf, int nbytes) {
     }
     checksum %= 256; // Garantir que está no intervalo de um byte
     
-    // Converte o checksum para ASCII (3 dígitos)
-    snprintf(checksum_str, sizeof(checksum_str), "%03d", checksum);
-    
-    // Compara os caracteres gerados com os armazenados no RX buffer
-    if (checksum_str[0] != UARTRxBuffer[nbytes] ||
-        checksum_str[1] != UARTRxBuffer[nbytes + 1] ||
-        checksum_str[2] != UARTRxBuffer[nbytes + 2]) {
-        return 0; // Checksum inválido
-    }
-    
-    return 1; // Checksum válido		
+	return checksum;	
 }
 
 /*
@@ -191,7 +232,7 @@ int rxChar(unsigned char car)
 	/* If rxbuff not full add char to it */
 	if (rxBufLen < UART_RX_SIZE) {
 		UARTRxBuffer[rxBufLen] = car;
-		rxBufLen += 1;
+		rxBufLen ++;
 		return 0;		
 	}	
 	/* If cmd string full return error */
@@ -207,7 +248,7 @@ int txChar(unsigned char car)
 	/* If rxbuff not full add char to it */
 	if (txBufLen < UART_TX_SIZE) {
 		UARTTxBuffer[txBufLen] = car;
-		txBufLen ++;
+		txBufLen += 1;
 		return 0;		
 	}	
 	/* If cmd string full return error */
@@ -219,7 +260,8 @@ int txChar(unsigned char car)
  */
 void resetRxBuffer(void)
 {
-	rxBufLen = 0;		
+	rxBufLen = 0;	
+	memset(UARTRxBuffer, 0, UART_RX_SIZE); 
 	return;
 }
 
@@ -228,7 +270,8 @@ void resetRxBuffer(void)
  */
 void resetTxBuffer(void)
 {
-	txBufLen = 0;		
+	txBufLen = 0;	
+	memset(UARTTxBuffer, 0, UART_TX_SIZE); 	
 	return;
 }
 
@@ -237,12 +280,33 @@ void resetTxBuffer(void)
  */
 void getTxBuffer(unsigned char * buf, int * len)
 {
-	*len = txBufLen;
-	if(txBufLen > 0) {
-		memcpy(buf,UARTTxBuffer,*len);
-	}	
+    *len = txBufLen;
+    if (txBufLen > 0) {
+        memcpy(buf, UARTTxBuffer, *len);
+    }	
 	
 	return;
 }
 
 
+/*
+ * getRxBuffer
+ */
+void getRxBuffer(unsigned char *buf, int *len) {
+
+    *len = rxBufLen;
+    if (rxBufLen > 0) {
+        memcpy(buf, UARTRxBuffer, rxBufLen); 
+    }
+	return;
+}
+
+void copyRxToTxBuffer(unsigned char *buf, int *len) {
+    if (rxBufLen > 0) {
+        memcpy(UARTTxBuffer, UARTRxBuffer, rxBufLen); 
+		memcpy(buf, UARTTxBuffer, rxBufLen); 
+        *len = rxBufLen;  
+    } else {
+        *len = 0;  
+    }
+}

@@ -16,7 +16,6 @@
 #include <string.h>
 #include "cmdproc.h"
 
-
 int main(void) 
 {
 	int i,len, err;
@@ -47,15 +46,7 @@ int main(void)
 	
 	cmdProcessor();
 
-	txChar('#');
-	txChar('P');
-	txChar('t');
-	txChar('1');
-	txChar('9');
-	txChar('6');
-	txChar('!');
-
-	getTxBuffer(ans, &len);
+	copyRxToTxBuffer(ans, &len);
 
 	/* You can print the answer to see what is wrong, if necessary */
 	printf("\t Received answer: ");
@@ -101,6 +92,24 @@ int main(void)
 	}		
 	
 	/* Much more tests are needed. Unity shoul be used for it. */
-	
+
+	resetRxBuffer();
+    resetTxBuffer();
+    unsigned char tx[256];
+    int len2;
+
+    rxChar(SOF_SYM);
+    rxChar(' ');
+    rxChar('L');
+    rxChar(' ');
+    rxChar(EOF_SYM);
+    rxChar('\n');
+
+    cmdProcessor();
+    printf("Generated Response: %s\n", tx);
+    getTxBuffer(tx,&len2); 
+    tx[len2] = '\0';
+	printf("%s",tx);
+
 	return 0;
 }
