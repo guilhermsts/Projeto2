@@ -27,4 +27,6 @@ digraph "src/test.c"
   Node10 -> Node11 [id="edge11_Node000010_Node000011",color="steelblue1",style="solid",tooltip=" "];
   Node11 [id="Node000011",label="stdlib.h",height=0.2,width=0.4,color="grey60", fillcolor="#E0E0E0", style="filled",tooltip=" "];
   Node10 -> Node7 [id="edge12_Node000010_Node000007",color="steelblue1",style="solid",tooltip=" "];
+  Node1 -> Node12 [id="edge13_Node000001_Node000012",color="steelblue1",style="solid",tooltip=" "];
+  Node12 [id="Node000012",label="cmdproc.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$cmdproc_8h.html",tooltip="Módulo de processamento de comandos recebidos via UART."];
 }

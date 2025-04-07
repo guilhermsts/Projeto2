@@ -1,3 +1,13 @@
+/** \file main.c
+ *  \brief Ficheiro de simulação do projeto 2
+ * 
+ *  São feitos alguns testes às funções implementadas e é simulado o projeto a implementar. De notar que aqui é só suposto ter uma visão e resultados finais do projeto.
+ *  Para testar as funções uma a uma foi feito um ficheiro unity.c. 
+ * 
+ *  \author Francisco Bastos, 103359
+ *  \date 06/04/2025
+ */
+
 /* ******************************************************/
 /* SETR 23/24, Paulo Pedreiras                          */
 /* 		Sample code for Assignment 2					*/

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['test_2ec_0',['test.c',['../test_8c.html',1,'']]]
+  ['main_2ec_0',['main.c',['../main_8c.html',1,'']]]
 ];

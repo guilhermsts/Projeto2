@@ -1,3 +1,13 @@
+/** \file cmdproc.c
+ *  \brief Implementação do módulo de processamento de comandos recebidos via UART.
+ * 
+ *  No ficheiro são implemenatdas as funções para o processamento de comandos recebidos via UART e tratar dados de um sensor inteligente.
+ *  Foi desenvolvido à parte um módulo para o sensor inteligente, sendo usado valores e funções aí desenvolvidos. 
+ * 
+ *  \author Francisco Bastos, 103359
+ *  \date 06/04/2025
+ */
+
 /* ****************************** */
 /* See cmdProc.h for indications  */
 /* ****************************** */

@@ -1,3 +1,13 @@
+/** \file cmdproc.h
+ *  \brief Módulo de processamento de comandos recebidos via UART.
+ * 
+ *  No ficheiro são declaradas as funções para o processamento de comandos recebidos via UART e tratar dados de um sensor inteligente.
+ *  O código é com base num fornecido pelo professor, adaptado a pretendido para o projeto.
+ * 
+ *  \author Francisco Bastos, 103359
+ *  \date 06/04/2025
+ */
+
 /* ******************************************************/
 /* SETR 23/24, Paulo Pedreiras                          */
 /*	Base code for Unit Testing                          */
