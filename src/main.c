@@ -32,7 +32,7 @@ int main(void)
 	int  err;
 	int len,i;
 	unsigned char ans[30]; 
-	unsigned char ansTest1[]={'#','p','t', '+', '2', '1', '1', '1', '4','!'};
+	unsigned char ansTest1[]={'#',' ','P',' ','t', ' ', '0','.','0',' ','1', '4', '6', ' ','!','\n'};
 	
 	printf("\n Smart Sensor interface emulation \n");
 	printf(" \t - simple illustration of interface and use \n\n\r");
@@ -84,21 +84,26 @@ int main(void)
 	
 	
 	/* Test 2 */
-	
+	resetRxBuffer();
 	printf("Test2 - check the answer to a transmission omission/error \n");
 	
 	/* 1 - send the command */
 	rxChar('#');
+	rxChar(' ');
 	rxChar('P');
+	rxChar(' ');
 	// rxChar('t'); - simulates missing character, emulates a tx error 
 	rxChar('1');
 	rxChar('9');
 	rxChar('6');
+	rxChar(' ');
 	rxChar('!');
+	rxChar('\n');
 			
 	/* 2 - Process the comand and check the answer */
 	
-	err=cmdProcessor();
+	err = cmdProcessor();
+	printf("%d",err);
 		
 	if(err == -2) {
 		printf("Test 2 succeeded, as omission was detected\n");
