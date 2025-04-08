@@ -3,12 +3,12 @@
 Segundo projeto desenvolvido na cadeira de SETR, Sistemas Embutidos e de Tempo Real, onde consiste na implementação de um módulo em C que processe comandos recebidos via UART, um caracter de cada vez. O modulo é parte de um sensor inteligentre que permite a leitura de temperarura (-50ºC ... 60ºC), da humidade relativa (0 ... 100%) e de CO2 (400 ... 20000 ppm).
 
 ## Especificações 
-Estrutura dos comandos: **# CMD DATA CS !**
-* **- #**: um byte, inicio do frame do símbolo
+Estrutura dos comandos:  **# CMD DATA CS !**
+* **- #**: um byte, símbolo de inicio do frame
 * **- CMD**: um byte, indicação do comando
 * **- DATA**: tamanho variável, argumentos do comando
 * **- CS**: um byte, checksum. Somatório do valor numérico de CMD e DATA[i] bytes
-* **- !**: um byte, inicio do frame do símbolo
+* **- !**: um byte, símbolo de fim do frame
 
 Todas as comunicações são em ASCII. E. g. se a temperatura for +25ºC, os bytes correspondentes serão 43 ('+'), 50 ('2') e 53 ('5').
 
@@ -19,10 +19,10 @@ Comandos suportados:
 * **- R**: restaura o histórico
 
 ## Estrutura do código
-* `src/lib` - Ficheiros .c e .h dos módulos
-* `src` - Ficheiros main e teste (untiy testing)
-* `Doc` - Geração da página web com a documentação
-* `README` - Instruções compilação e gerar a documentação
+* **src/lib** - Ficheiros .c e .h dos módulos
+* **src** - Ficheiros main e teste (untiy testing)
+* **Doc** - Geração da página web com a documentação
+* **README** - Instruções compilação e gerar a documentação
 
 ## Ficheiros 
 * **cmdproc (.c/.h)**: Ficheiros header e sua respetiva implementação do módulo de processamento dos comandos recebidos via UART
