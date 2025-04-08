@@ -65,9 +65,11 @@ double read_humidity()
 
 int read_co2()
 {
-    int value = co2_data[c02_data_index++];
-    co2_history[co2_history_index++] = value;
 
+    int value = co2_data[c02_data_index++];
+
+    co2_history[co2_history_index++] = value;
+    
     if (c02_data_index >= DATA_SIZE)
     {
         c02_data_index = 0;
@@ -122,7 +124,7 @@ void get_last_hum_data(double* buffer)
 void get_last_co2_data(int* buffer)
 {
     int index = (co2_history_index == 0) ? (HISTORY_SIZE - 1) : (co2_history_index - 1);
-    
+
     for (int i = 0; i < HISTORY_SIZE; i++)
     {
        buffer[i] = co2_history[index];
@@ -144,4 +146,16 @@ void history_reset(int* buffer)
     {
         buffer[i] = 0;
     }
+}
+
+void reset_indices()
+{
+    temp_data_index = 0;
+    temp_history_index = 0;
+
+    hum_data_index = 0;
+    hum_history_index = 0;
+
+    c02_data_index = 0;
+    co2_history_index = 0;
 }

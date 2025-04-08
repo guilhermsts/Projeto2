@@ -87,5 +87,7 @@ void get_last_co2_data(int* buffer);
  */
 void history_reset(int* buffer);
 
+void reset_indices();
+
 #endif // SENSORS_H
 

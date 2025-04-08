@@ -25,10 +25,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "cmdproc.h"
+#include "sensors.h"
 
 int main(void) 
 {
-	int i,len, err;
+	int  err;
+	int len,i;
 	unsigned char ans[30]; 
 	unsigned char ansTest1[]={'#','p','t', '+', '2', '1', '1', '1', '4','!'};
 	
@@ -45,8 +47,11 @@ int main(void)
 	
 	/* 1 - send the command */
 	rxChar('#');
+	rxChar(' ');
 	rxChar('P');
+	rxChar(' ');
 	rxChar('t');
+	rxChar(' ');
 	rxChar('1');
 	rxChar('9');
 	rxChar('6');
@@ -56,9 +61,9 @@ int main(void)
 	
 	cmdProcessor();
 
-	copyRxToTxBuffer(ans, &len);
+	getTxBuffer(ans, &len);
 
-	/* You can print the answer to see what is wrong, if necessary */
+	 /*You can print the answer to see what is wrong, if necessary */
 	printf("\t Received answer: ");
 	
 		for (i = 0; i < len; i++) {
@@ -102,24 +107,6 @@ int main(void)
 	}		
 	
 	/* Much more tests are needed. Unity shoul be used for it. */
-
-	resetRxBuffer();
-    resetTxBuffer();
-    unsigned char tx[256];
-    int len2;
-
-    rxChar(SOF_SYM);
-    rxChar(' ');
-    rxChar('L');
-    rxChar(' ');
-    rxChar(EOF_SYM);
-    rxChar('\n');
-
-    cmdProcessor();
-    printf("Generated Response: %s\n", tx);
-    getTxBuffer(tx,&len2); 
-    tx[len2] = '\0';
-	printf("%s",tx);
 
 	return 0;
 }

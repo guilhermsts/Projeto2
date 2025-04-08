@@ -58,8 +58,6 @@ int cmdProcessor(void)
 	if(i < rxBufLen) {
 		
 		switch(UARTRxBuffer[i+2]) { 
-			
-            
 
 			case 'A':
                 double temperature = read_temperature();
@@ -110,7 +108,7 @@ int cmdProcessor(void)
                     sensor_type = 'h';
                     snprintf(response1, sizeof(response1), "P %c %.1f", sensor_type,humidity);
                     int checksumP = calcChecksum((unsigned char *)response1, strlen(response1));
-                    snprintf(final_response1, sizeof(final_response1), "# P %c %.1f %03d", sensor_type, humidity, checksumP);
+                    snprintf(final_response1, sizeof(final_response1), "# P %c %05.1f %03d", sensor_type, humidity, checksumP);
                     for (int i = 0; final_response1[i] != '\0'; i++) {
                         txChar(final_response1[i]);
                     }
@@ -145,9 +143,7 @@ int cmdProcessor(void)
 				if(UARTRxBuffer[i+6] != EOF_SYM) {
 					return -4;
 				}
-
-                
-				
+	
 				break;
 					
 			case 'L':
@@ -163,11 +159,16 @@ int cmdProcessor(void)
                 get_last_hum_data(hum_buffer);
                 get_last_co2_data(co2_buffer);
 
+                for (int i = 0; i < HISTORY_SIZE; i++) {
+                    printf("temp_buffer[%d] = %.1f, hum_buffer[%d] = %.1f, co2_buffer[%d] = %d\n", 
+                            i, temp_buffer[i], i, hum_buffer[i], i, co2_buffer[i]);
+                }
+
+
                 for (int i = 0; i < 10; i++) {
                     snprintf(response2, sizeof(response2), "L %.1f %.1f %d ", temp_buffer[i], hum_buffer[i], co2_buffer[i]);
                     int checksumL = calcChecksum((unsigned char *)response2, strlen(response2));
                     snprintf(final_response2, sizeof(final_response2), "# L %.1f %.1f %d %03d", temp_buffer[i], hum_buffer[i], co2_buffer[i], checksumL);
-                    //printf("%s", final_response2);
                     for (int i = 0; final_response2[i] != '\0'; i++) {
                         txChar(final_response2[i]);
                     }
@@ -175,7 +176,6 @@ int cmdProcessor(void)
                     txChar(EOF_SYM);
                     txChar('\n');
                 }
-                printf("txBuffer preenchido: %s\n", UARTTxBuffer);
 
                 break;
 
@@ -254,15 +254,15 @@ int rxChar(unsigned char car)
  */
 int txChar(unsigned char car)
 {
-
-	/* If rxbuff not full add char to it */
 	if (txBufLen < UART_TX_SIZE) {
-		UARTTxBuffer[txBufLen] = car;
-		txBufLen += 1;
-		return 0;		
-	}	
-	/* If cmd string full return error */
-	return -1;
+        UARTTxBuffer[txBufLen] = car;
+        txBufLen ++;
+        return 0;
+    } else {
+        // Log de erro ou mensagem para depuração
+        printf("Erro: Buffer de transmissão cheio!\n");
+        return -1;
+    }
 }
 
 /*
@@ -270,8 +270,8 @@ int txChar(unsigned char car)
  */
 void resetRxBuffer(void)
 {
-	rxBufLen = 0;	
 	memset(UARTRxBuffer, 0, UART_RX_SIZE); 
+    rxBufLen = 0;	
 	return;
 }
 
@@ -280,8 +280,8 @@ void resetRxBuffer(void)
  */
 void resetTxBuffer(void)
 {
-	txBufLen = 0;	
-	memset(UARTTxBuffer, 0, UART_TX_SIZE); 	
+	memset(UARTTxBuffer, 0, UART_TX_SIZE); 
+    txBufLen = 0;	
 	return;
 }
 
@@ -290,10 +290,14 @@ void resetTxBuffer(void)
  */
 void getTxBuffer(unsigned char * buf, int * len)
 {
-    *len = txBufLen;
     if (txBufLen > 0) {
-        memcpy(buf, UARTTxBuffer, *len);
-    }	
+        memcpy(buf, UARTTxBuffer, txBufLen);
+        *len = txBufLen;
+        buf[*len] = '\0';
+    } else {
+        *len = 0;
+        printf("txBuffer está vazio.\n");
+    }
 	
 	return;
 }

@@ -31,18 +31,19 @@ extern int txBufLen;
 
 const char expected_frame_A[] = "# A -39.3 5.8 2500 253 !\n";
 const char expected_frame_Pt[] = "# P t -39.3 254 !\n";
-const char expected_frame_Ph[] = "# P h 5.8 147 !\n";
+const char expected_frame_Ph[] = "# P h 005.8 147 !\n";
 const char expected_frame_Pc[] = "# P c 2500 186 !\n";
-const char expected_frame_L[] = "# L -50.0 0.0 400 045 !\n"
-                               " # L -39.3 5.8 2500 056 !\n"
-                               " # L -21.0 15.2 5000 067 !\n"
-                               " # L -9.7 24.6 7500 078 !\n"
-                               " # L 0.0 33.3 10000 089 !\n"
-                               " # L 12.2 50.0 12500 100 !\n"
-                               " # L 29.5 67.2 15000 111 !\n"
-                               " # L 40.1 75.5 17500 122 !\n"
-                               " # L 53.0 89.9 19000 133 !\n"
-                               " # L 60.0 100.0 20000 144 !\n";
+const char expected_frame_L[] = "# L 60.0 100.0 20000 175 !\n"
+                                "# L 53.0 89.9 19000 154 !\n"
+                                "# L 40.1 75.5 17500 091 !\n"
+                                "# L 29.5 67.2 15000 093 !\n"
+                                "# L 12.2 50.0 12500 074 !\n"
+                                "# L 0.0 33.3 10000 018 !\n"
+                                "# L -9.7 24.6 7500 045 !\n"
+                                "# L -21.0 15.2 5000 069 !\n"
+                                "# L -39.3 5.8 2500 040 !\n"
+                                "# L -50.0 0.0 400 222 !\n";
+
 const char expected_frame_R[] = "# R 0 162 !\n";
 
 
@@ -51,7 +52,7 @@ void setUp(void)
     // inicializar o buffer
     resetRxBuffer();
     resetTxBuffer();
-
+   // reset_indices();
     return;
 }
 
@@ -234,7 +235,6 @@ void test_calc_checksum(void)
 
 void test_command_A(void)
 {
-
     resetRxBuffer();
     resetTxBuffer();
     unsigned char tx[30];
@@ -339,8 +339,6 @@ void test_command_P_k(void)
     resetRxBuffer();
     resetTxBuffer();
 
-    int return_expected;
-
     rxChar(SOF_SYM);
     rxChar(' ');
     rxChar('P');
@@ -350,17 +348,25 @@ void test_command_P_k(void)
     rxChar(EOF_SYM);
     rxChar('\n');
 
-    return_expected = cmdProcessor();
-    TEST_ASSERT_EQUAL_INT(-2,return_expected);
+    int actual_return =  cmdProcessor();
+
+    TEST_ASSERT_EQUAL_INT(-2,actual_return);
 
 }
 
 void test_command_L(void)
 {
     resetRxBuffer();
-    resetTxBuffer();
     unsigned char tx[256];
     int len;
+
+    reset_indices();
+
+    for (int i = 0; i < HISTORY_SIZE; i++) {
+		read_temperature();
+		read_humidity();
+		read_co2();
+	}
 
     rxChar(SOF_SYM);
     rxChar(' ');
@@ -369,13 +375,14 @@ void test_command_L(void)
     rxChar(EOF_SYM);
     rxChar('\n');
 
-    cmdProcessor();
+    int actual_return =  cmdProcessor();
     
+
+    TEST_ASSERT_EQUAL_INT(0,actual_return);
     getTxBuffer(tx,&len); 
-    tx[len] = '\0';
 
     // Imprime a resposta gerada para depuração
-    printf("Generated Response: %s\n", tx);
+    printf("\nGenerated Response: \n%s\n", tx);
 
     TEST_ASSERT_EQUAL_STRING(expected_frame_L,tx);
 
@@ -463,6 +470,9 @@ int main(void)
     RUN_TEST(test_command_P_h);
     RUN_TEST(test_command_P_c);
     RUN_TEST(test_command_P_k);
+
+    RUN_TEST(test_history_reset);
+
     RUN_TEST(test_command_L);
     RUN_TEST(test_command_R);
     RUN_TEST(test_command_X);
