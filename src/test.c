@@ -33,11 +33,11 @@ const char expected_frame_A[] = "# A -39.3 5.8 2500 253 !\n";
 const char expected_frame_Pt[] = "# P t -39.3 254 !\n";
 const char expected_frame_Ph[] = "# P h 005.8 147 !\n";
 const char expected_frame_Pc[] = "# P c 2500 186 !\n";
-const char expected_frame_L[] = "# L 60.0 100.0 20000 175 !\n"
-                                "# L 53.0 89.9 19000 154 !\n"
-                                "# L 40.1 75.5 17500 091 !\n"
-                                "# L 29.5 67.2 15000 093 !\n"
-                                "# L 12.2 50.0 12500 074 !\n"
+const char expected_frame_L[] = "# L +60.0 100.0 20000 218 !\n"
+                                "# L +53.0 89.9 19000 197 !\n"
+                                "# L +40.1 75.5 17500 134 !\n"
+                                "# L +29.5 67.2 15000 136 !\n"
+                                "# L +12.2 50.0 12500 117 !\n"
                                 "# L 0.0 33.3 10000 018 !\n"
                                 "# L -9.7 24.6 7500 045 !\n"
                                 "# L -21.0 15.2 5000 069 !\n"
@@ -352,15 +352,19 @@ void test_command_P_k(void)
 
     TEST_ASSERT_EQUAL_INT(-2,actual_return);
 
+
 }
 
 void test_command_L(void)
 {
     resetRxBuffer();
-    unsigned char tx[256];
+    unsigned char tx[300];
     int len;
 
+    int reset_obtained[HISTORY_SIZE];
+
     reset_indices();
+    history_reset(reset_obtained);
 
     for (int i = 0; i < HISTORY_SIZE; i++) {
 		read_temperature();
@@ -454,6 +458,7 @@ int main(void)
 {
     UNITY_BEGIN();
 
+
     RUN_TEST(test_read_temperature);
     RUN_TEST(test_read_humidity);
     RUN_TEST(test_read_co2);
@@ -472,8 +477,9 @@ int main(void)
     RUN_TEST(test_command_P_k);
 
     RUN_TEST(test_history_reset);
-
     RUN_TEST(test_command_L);
+
+
     RUN_TEST(test_command_R);
     RUN_TEST(test_command_X);
     RUN_TEST(test_command_SOF);

@@ -69,7 +69,7 @@ int cmdProcessor(void)
 
                 snprintf(response, sizeof(response), "A %.1f %.1f %d", temperature, humidity, co2);
                 int checksum = calcChecksum((unsigned char *)response, strlen(response));
-                
+
                 snprintf(final_response, sizeof(final_response), "# A %.1f %.1f %d %03d", temperature, humidity, co2, checksum);
 
                 for (int i = 0; final_response[i] != '\0'; i++) {
@@ -147,8 +147,8 @@ int cmdProcessor(void)
 				break;
 					
 			case 'L':
-                char response2[256];
-                char final_response2[256];
+                char response2[300];
+                char final_response2[300];
                 int len = 0;
 
                 memset(response2, 0, sizeof(response2));
@@ -160,15 +160,24 @@ int cmdProcessor(void)
                 get_last_co2_data(co2_buffer);
 
                 for (int i = 0; i < HISTORY_SIZE; i++) {
-                    printf("temp_buffer[%d] = %.1f, hum_buffer[%d] = %.1f, co2_buffer[%d] = %d\n", 
-                            i, temp_buffer[i], i, hum_buffer[i], i, co2_buffer[i]);
+                    printf("LEITURA %d: temp_buffer[%d] = %.1f, hum_buffer[%d] = %.1f, co2_buffer[%d] = %d\n", 
+                            i+1,i, temp_buffer[i], i, hum_buffer[i], i, co2_buffer[i]);
                 }
 
 
                 for (int i = 0; i < 10; i++) {
-                    snprintf(response2, sizeof(response2), "L %.1f %.1f %d ", temp_buffer[i], hum_buffer[i], co2_buffer[i]);
+                    if( temp_buffer[i] > 0 )
+                        snprintf(response2, sizeof(response2), "L +%.1f %.1f %d ", temp_buffer[i], hum_buffer[i], co2_buffer[i]);
+                    else
+                        snprintf(response2, sizeof(response2), "L %.1f %.1f %d ", temp_buffer[i], hum_buffer[i], co2_buffer[i]);
+
                     int checksumL = calcChecksum((unsigned char *)response2, strlen(response2));
-                    snprintf(final_response2, sizeof(final_response2), "# L %.1f %.1f %d %03d", temp_buffer[i], hum_buffer[i], co2_buffer[i], checksumL);
+
+                    if( temp_buffer[i] > 0 )
+                        snprintf(final_response2, sizeof(final_response2), "# L +%.1f %.1f %d %03d", temp_buffer[i], hum_buffer[i], co2_buffer[i], checksumL);
+                    else
+                        snprintf(final_response2, sizeof(final_response2), "# L %.1f %.1f %d %03d", temp_buffer[i], hum_buffer[i], co2_buffer[i], checksumL);
+
                     for (int i = 0; final_response2[i] != '\0'; i++) {
                         txChar(final_response2[i]);
                     }
