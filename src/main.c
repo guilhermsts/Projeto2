@@ -103,7 +103,6 @@ int main(void)
 	/* 2 - Process the comand and check the answer */
 	
 	err = cmdProcessor();
-	printf("%d",err);
 		
 	if(err == -2) {
 		printf("Test 2 succeeded, as omission was detected\n");

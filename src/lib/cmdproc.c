@@ -159,12 +159,6 @@ int cmdProcessor(void)
                 get_last_hum_data(hum_buffer);
                 get_last_co2_data(co2_buffer);
 
-                for (int i = 0; i < HISTORY_SIZE; i++) {
-                    printf("LEITURA %d: temp_buffer[%d] = %.1f, hum_buffer[%d] = %.1f, co2_buffer[%d] = %d\n", 
-                            i+1,i, temp_buffer[i], i, hum_buffer[i], i, co2_buffer[i]);
-                }
-
-
                 for (int i = 0; i < 10; i++) {
                     if( temp_buffer[i] > 0 )
                         snprintf(response2, sizeof(response2), "L +%.1f %.1f %d ", temp_buffer[i], hum_buffer[i], co2_buffer[i]);

@@ -385,8 +385,6 @@ void test_command_L(void)
     TEST_ASSERT_EQUAL_INT(0,actual_return);
     getTxBuffer(tx,&len); 
 
-    // Imprime a resposta gerada para depuração
-    printf("\nGenerated Response: \n%s\n", tx);
 
     TEST_ASSERT_EQUAL_STRING(expected_frame_L,tx);
 
