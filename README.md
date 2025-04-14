@@ -1,9 +1,9 @@
 # Projeto2
 ** PARA COMPILAR **
-```
+``` 
 cd mkdir build
 cd build
-cmake ../Projeto2/src
+cmake ../src
 make
 ./main
 ```
