@@ -87,6 +87,13 @@ void get_last_co2_data(int* buffer);
  */
 void history_reset(int* buffer);
 
+/** \brief Reset dos índices usados
+ * 
+ *  A função repõe os índices usados, nas funções implementadas, de volta à posição inicial.
+ * 
+ *  \author Francisco Bastos, 103359
+ *  \date 07/04/2025 
+ */
 void reset_indices();
 
 #endif // SENSORS_H

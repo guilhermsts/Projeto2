@@ -18,12 +18,6 @@ Comandos suportados:
 * **- L**: retorna os últimos 20 valores lidos para cada variável 
 * **- R**: restaura o histórico
 
-## Estrutura do código
-* **src/lib** - Ficheiros .c e .h dos módulos
-* **src** - Ficheiros main e teste (untiy testing)
-* **Doc** - Geração da página web com a documentação
-* **README** - Instruções compilação e gerar a documentação
-
 ## Ficheiros 
 * **cmdproc (.c/.h)**: Ficheiros header e sua respetiva implementação do módulo de processamento dos comandos recebidos via UART
 * **sensors (.c/.h)**: Ficheiros header e sua respetiva implementação do sensor que faz a leitura dos três parâmetros
